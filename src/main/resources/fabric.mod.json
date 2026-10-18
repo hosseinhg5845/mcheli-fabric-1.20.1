@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "mcheli",
+  "version": "${version}",
+  "name": "MC Helicopter Overdrive",
+  "description": "MC Helicopter Overdrive - F-22 Raptor & F-35 Lightning II Edition.\nAdds realistic aircraft, helicopters, and weapons to Minecraft 1.20.1.",
+  "authors": [
+    "EMB4",
+    "MrNorwood",
+    "Murachiki27",
+    "RagexPrince683",
+    "Ported to Fabric 1.20.1 by the F-22 Edition Team"
+  ],
+  "contact": {
+    "homepage": "https://github.com/hosseinhg5845/F22",
+    "sources": "https://github.com/hosseinhg5845/F22",
+    "issues": "https://github.com/hosseinhg5845/F22/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/mcheli/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.norwood.mcheli.MCHeliFabric"
+    ],
+    "client": [
+      "com.norwood.mcheli.MCHeliFabricClient"
+    ]
+  },
+  "mixins": [
+    "mcheli.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric-api": "*",
+    "minecraft": "~1.20.1",
+    "java": ">=17"
+  },
+  "suggests": {
+    "sodium": "*"
+  }
+}

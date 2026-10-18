@@ -1,0 +1,28 @@
+/*    */ package com.norwood.mcheli.helper.client.model.loader;
+/*    */ 
+/*    */ import com.norwood.mcheli.helper.client._IModelCustom;
+/*    */ import com.norwood.mcheli.helper.client._ModelFormatException;
+/*    */ import java.io.IOException;
+/*    */ import javax.annotation.Nullable;
+/*    */ import net.minecraft.resource.ResourceManager;
+/*    */ import net.minecraft.util.ResourceLocation;
+
+
+/*    */ 
+/*    */ /*    */ public interface IVertexModelLoader
+/*    */ {
+/*    */   String getExtension();
+/*    */   
+/*    */   @Nullable
+/*    */   _IModelCustom load(ResourceManager paramIResourceManager, ResourceLocation paramResourceLocation) throws IOException, _ModelFormatException;
+/*    */   
+/*    */   default ResourceLocation withExtension(ResourceLocation location) {
+/* 21 */     return new ResourceLocation(location.getResourceDomain(), location.getResourcePath() + "." + getExtension());
+/*    */   }
+/*    */ }
+
+
+/* Location:              C:\Users\ASUS\Desktop\De-Compile\plmcjar\mchelionukebeta.jar!\com\norwood\mcheli\helper\client\model\loader\IVertexModelLoader.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

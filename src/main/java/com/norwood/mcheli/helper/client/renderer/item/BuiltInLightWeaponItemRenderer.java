@@ -1,0 +1,66 @@
+/*    */ package com.norwood.mcheli.helper.client.renderer.item;
+/*    */ 
+/*    */ import com.norwood.mcheli.MCH_Config;
+/*    */ import com.norwood.mcheli.MCH_ModelManager;
+/*    */ import com.norwood.mcheli.lweapon.MCH_ItemLightWeaponBase;
+/*    */ import com.norwood.mcheli.wrapper.W_Lib;
+/*    */ import com.norwood.mcheli.wrapper.W_McClient;
+/*    */ import net.minecraft.client.render.model.json.ModelTransformationMode;
+/*    */ import net.minecraft.entity.Entity;
+/*    */ import net.minecraft.entity.LivingEntity;
+/*    */ import net.minecraft.entity.player.PlayerEntity;
+/*    */ import net.minecraft.item.ItemStack;
+/*    */ import net.minecraft.util.Hand;
+
+
+/*    */ import org.lwjgl.opengl.GL11;
+/*    */ 
+/*    */ /*    */ public class BuiltInLightWeaponItemRenderer implements IItemModelRenderer {
+/*    */   public boolean shouldRenderer(ItemStack itemStack, ModelTransformationMode.TransformType transformType) {
+/* 21 */     return (IItemModelRenderer.isFirstPerson(transformType) || IItemModelRenderer.isThirdPerson(transformType));
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public void renderItem(ItemStack itemStack, LivingEntity entityLivingBase, ModelTransformationMode.TransformType transformType, float partialTicks) {
+/* 26 */     boolean isRender = false;
+/* 27 */     if (IItemModelRenderer.isFirstPerson(transformType) || IItemModelRenderer.isThirdPerson(transformType)) {
+/* 28 */       isRender = true;
+/* 29 */       if (entityLivingBase instanceof PlayerEntity) { PlayerEntity player = (PlayerEntity)entityLivingBase;
+/* 30 */         if (MCH_ItemLightWeaponBase.isHeld(player) && W_Lib.isFirstPerson() && W_Lib.isClientPlayer((Entity)player)) {
+/* 31 */           isRender = false;
+/*    */         } }
+/*    */     
+/*    */     } 
+/*    */     
+/* 36 */     if (isRender) {
+/* 37 */       renderItem(itemStack, IItemModelRenderer.isFirstPerson(transformType), entityLivingBase);
+/*    */     }
+/*    */   }
+/*    */   
+/*    */   private void renderItem(ItemStack itemStack, boolean isFirstPerson, LivingEntity entity) {
+/* 42 */     String name = MCH_ItemLightWeaponBase.getName(itemStack);
+/* 43 */     GL11.glEnable(32826);
+/* 44 */     GL11.glEnable(2903);
+/* 45 */     GL11.glPushMatrix();
+/* 46 */     if (MCH_Config.SmoothShading.prmBool) {
+/* 47 */       GL11.glShadeModel(7425);
+/*    */     }
+/*    */     
+/* 50 */     GL11.glEnable(2884);
+/* 51 */     W_McClient.MOD_bindTexture("textures/lweapon/" + name + ".png");
+/* 52 */     if (isFirstPerson && entity.isHandActive() && entity.getActiveHand() == Hand.MAIN_HAND) {
+/* 53 */       GL11.glTranslated(0.12999999523162842D, 0.27000001072883606D, 0.009999999776482582D);
+/*    */     }
+/*    */     
+/* 56 */     MCH_ModelManager.render("lweapons", name);
+/* 57 */     GL11.glShadeModel(7424);
+/* 58 */     GL11.glPopMatrix();
+/* 59 */     GL11.glDisable(32826);
+/*    */   }
+/*    */ }
+
+
+/* Location:              C:\Users\ASUS\Desktop\De-Compile\plmcjar\mchelionukebeta.jar!\com\norwood\mcheli\helper\client\renderer\item\BuiltInLightWeaponItemRenderer.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

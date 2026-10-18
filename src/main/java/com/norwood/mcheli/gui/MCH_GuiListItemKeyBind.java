@@ -1,0 +1,77 @@
+/*    */ package com.norwood.mcheli.gui;
+/*    */ 
+/*    */ import com.norwood.mcheli.MCH_ConfigPrm;
+/*    */ import com.norwood.mcheli.MCH_KeyName;
+/*    */ import net.minecraft.client.Minecraft;
+/*    */ import net.minecraft.client.gui.DrawableHelperButton;
+/*    */ 
+/*    */ public class MCH_GuiListItemKeyBind extends MCH_GuiListItem {
+/*    */   public final int defaultKeycode;
+/*    */   public final String displayString;
+/*    */   public final ButtonWidget button;
+/*    */   public final ButtonWidget buttonReset;
+/*    */   public int keycode;
+/*    */   public final MCH_ConfigPrm config;
+/*    */   public ButtonWidget lastPushButton;
+/*    */   
+/*    */   public MCH_GuiListItemKeyBind(int id, int idReset, int posX, String dispStr, MCH_ConfigPrm prm) {
+/* 18 */     this.displayString = dispStr;
+/* 19 */     this.defaultKeycode = prm.prmIntDefault;
+/* 20 */     this.button = new ButtonWidget(id, posX + 160, 0, 70, 20, "");
+/* 21 */     this.buttonReset = new ButtonWidget(idReset, posX + 240, 0, 40, 20, "Reset");
+/* 22 */     this.config = prm;
+/* 23 */     this.lastPushButton = null;
+/* 24 */     setKeycode(prm.prmInt);
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public void mouseReleased(int x, int y) {
+/* 29 */     this.button.mouseReleased(x, y);
+/* 30 */     this.buttonReset.mouseReleased(x, y);
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public boolean mousePressed(Minecraft mc, int x, int y) {
+/* 35 */     if (this.button.mousePressed(mc, x, y)) {
+/* 36 */       this.lastPushButton = this.button;
+/* 37 */       return true;
+/* 38 */     }  if (this.buttonReset.mousePressed(mc, x, y)) {
+/* 39 */       this.lastPushButton = this.buttonReset;
+/* 40 */       return true;
+/*    */     } 
+/* 42 */     return false;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */   
+/*    */   public void draw(Minecraft mc, int mouseX, int mouseY, int posX, int posY, float partialTicks) {
+/* 48 */     int y = 6;
+/* 49 */     this.button.drawString(mc.fontRenderer, this.displayString, posX + 10, posY + y, -1);
+/* 50 */     this.button.y = posY;
+/* 51 */     this.button.drawButton(mc, mouseX, mouseY, partialTicks);
+/* 52 */     this.buttonReset.enabled = (this.keycode != this.defaultKeycode);
+/* 53 */     this.buttonReset.y = posY;
+/* 54 */     this.buttonReset.drawButton(mc, mouseX, mouseY, partialTicks);
+/*    */   }
+/*    */   
+/*    */   public void applyKeycode() {
+/* 58 */     this.config.setPrm(this.keycode);
+/*    */   }
+/*    */   
+/*    */   public void resetKeycode() {
+/* 62 */     setKeycode(this.defaultKeycode);
+/*    */   }
+/*    */   
+/*    */   public void setKeycode(int k) {
+/* 66 */     if (k != 0 && !MCH_KeyName.getDescOrName(k).isEmpty()) {
+/* 67 */       this.keycode = k;
+/* 68 */       this.button.displayString = MCH_KeyName.getDescOrName(k);
+/*    */     } 
+/*    */   }
+/*    */ }
+
+
+/* Location:              C:\Users\ASUS\Desktop\De-Compile\plmcjar\mchelionukebeta.jar!\com\norwood\mcheli\gui\MCH_GuiListItemKeyBind.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

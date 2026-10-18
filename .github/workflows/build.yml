@@ -1,0 +1,84 @@
+name: Build MCHeli Fabric 1.20.1
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          java-package: jdk
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: fabric-1.20.1-${{ runner.os }}-${{ hashFiles('build.gradle', 'gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build mod (best-effort)
+        continue-on-error: true
+        run: |
+          ./gradlew --no-daemon --stacktrace build 2>&1 | tee gradle-build.log
+          exit 0
+
+      - name: Collect artifacts
+        id: collect
+        run: |
+          set -e
+          mkdir -p dist
+          if [ -d build/libs ]; then
+            for f in build/libs/*.jar; do
+              [ -e "$f" ] || continue
+              cp "$f" dist/
+              JAR_FOUND=1
+            done
+          fi
+          [ -f gradle-build.log ] && cp gradle-build.log dist/ || true
+          ls -la dist/
+
+      - name: Upload build artifacts (manual dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcheli-fabric-build-artifacts
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Create GitHub Release (tag push)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: MCHeli Fabric ${{ github.ref_name }} (1.20.1)
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          body: |
+            # MC Helicopter Overdrive - Fabric 1.20.1 Edition
+
+            A port of MCHeli to Minecraft 1.20.1 (Fabric). Currently a work in progress.
+
+            See the build log (`gradle-build.log`) for the compile status — the mod may not
+            compile cleanly yet because the source is being incrementally migrated from
+            Forge 1.12.2 to Fabric 1.20.1.
+          files: |
+            dist/*.jar
+            dist/gradle-build.log
+          token: ${{ secrets.GITHUB_TOKEN }}

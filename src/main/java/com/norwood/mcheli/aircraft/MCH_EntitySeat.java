@@ -1,0 +1,246 @@
+/*     */ package com.norwood.mcheli.aircraft;
+/*     */ 
+/*     */ import com.norwood.mcheli.MCH_Lib;
+/*     */ import com.norwood.mcheli.helper.entity.IEntitySinglePassenger;
+/*     */ import com.norwood.mcheli.wrapper.W_Entity;
+/*     */ import java.util.List;
+/*     */ import javax.annotation.Nullable;
+/*     */ import net.minecraft.entity.Entity;
+/*     */ import net.minecraft.entity.player.PlayerEntity;
+/*     */ import net.minecraft.item.ItemStack;
+/*     */ import net.minecraft.nbt.NbtCompound;
+/*     */ import net.minecraft.entity.damage.DamageSource;
+/*     */ import net.minecraft.util.Hand;
+/*     */ import net.minecraft.util.math.Box;
+/*     */ import net.minecraft.world.World;
+
+
+/*     */ import org.jetbrains.annotations.NotNull;
+/*     */ 
+/*     */ public class MCH_EntitySeat
+/*     */   extends W_Entity
+/*     */   implements IEntitySinglePassenger
+/*     */ {
+/*     */   public static final float BB_SIZE = 1.0F;
+/*     */   public String parentUniqueID;
+/*     */   public int seatID;
+/*     */   public int parentSearchCount;
+/*     */   protected Entity lastRiddenByEntity;
+/*     */   private MCH_EntityAircraft parent;
+/*     */   
+/*     */   public MCH_EntitySeat(World world) {
+/*  32 */     super(world);
+/*  33 */     setSize(1.0F, 1.0F);
+/*  34 */     this.motionX = 0.0D;
+/*  35 */     this.motionY = 0.0D;
+/*  36 */     this.motionZ = 0.0D;
+/*  37 */     this.seatID = -1;
+/*  38 */     setParent((MCH_EntityAircraft)null);
+/*  39 */     this.parentSearchCount = 0;
+/*  40 */     this.lastRiddenByEntity = null;
+/*  41 */     this.ignoreFrustumCheck = true;
+/*  42 */     this.isImmuneToFire = true;
+/*     */   }
+/*     */   
+/*     */   public MCH_EntitySeat(World world, double x, double y, double z) {
+/*  46 */     this(world);
+/*  47 */     setPosition(x, y + 1.0D, z);
+/*  48 */     this.prevPosX = x;
+/*  49 */     this.prevPosY = y + 1.0D;
+/*  50 */     this.prevPosZ = z;
+/*     */   }
+/*     */   
+/*     */   protected boolean canTriggerWalking() {
+/*  54 */     return false;
+/*     */   }
+/*     */   
+/*     */   public Box getCollisionBox(Entity par1Entity) {
+/*  58 */     return par1Entity.getEntityBoundingBox();
+/*     */   }
+/*     */   
+/*     */   public Box getCollisionBoundingBox() {
+/*  62 */     return getEntityBoundingBox();
+/*     */   }
+/*     */   
+/*     */   public double getMountedYOffset() {
+/*  66 */     return -0.3D;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public boolean attackEntityFrom(DamageSource par1DamageSource, float par2) {
+/*  71 */     return (getParent() != null && getParent().attackEntityFrom(par1DamageSource, par2));
+/*     */   }
+/*     */   
+/*     */   public boolean canBeCollidedWith() {
+/*  75 */     return !this.isDead;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   /*     */   public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport) {}
+/*     */   
+/*     */   public void setDead() {
+/*  83 */     super.setDead();
+/*     */   }
+/*     */   
+/*     */   public void onUpdate() {
+/*  87 */     super.onUpdate();
+/*  88 */     this.fallDistance = 0.0F;
+/*  89 */     Entity riddenByEntity = getRiddenByEntity();
+/*  90 */     if (riddenByEntity != null) {
+/*  91 */       riddenByEntity.fallDistance = 0.0F;
+/*     */     }
+/*     */     
+/*  94 */     if (this.lastRiddenByEntity == null && riddenByEntity != null) {
+/*  95 */       if (getParent() != null) {
+/*  96 */         MCH_Lib.DbgLog(this.world, "MCH_EntitySeat.onUpdate:SeatID=%d", new Object[] { Integer.valueOf(this.seatID), riddenByEntity.toString() });
+/*  97 */         getParent().onMountPlayerSeat(this, riddenByEntity);
+/*     */       } 
+/*  99 */     } else if (this.lastRiddenByEntity != null && riddenByEntity == null && getParent() != null) {
+/* 100 */       MCH_Lib.DbgLog(this.world, "MCH_EntitySeat.onUpdate:SeatID=%d", new Object[] { Integer.valueOf(this.seatID), this.lastRiddenByEntity.toString() });
+/* 101 */       getParent().onUnmountPlayerSeat(this, this.lastRiddenByEntity);
+/*     */     } 
+/*     */     
+/* 104 */     if (this.world.isRemote) {
+/* 105 */       onUpdate_Client();
+/*     */     } else {
+/* 107 */       onUpdate_Server();
+/*     */     } 
+/*     */     
+/* 110 */     this.lastRiddenByEntity = getRiddenByEntity();
+/*     */   }
+/*     */   
+/*     */   private void onUpdate_Client() {
+/* 114 */     checkDetachmentAndDelete();
+/*     */   }
+/*     */   
+/*     */   private void onUpdate_Server() {
+/* 118 */     checkDetachmentAndDelete();
+/* 119 */     Entity riddenByEntity = getRiddenByEntity();
+/* 120 */     if (riddenByEntity == null || riddenByEntity.isDead);
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public void updatePassenger(@NotNull Entity passenger) {
+/* 125 */     updatePosition(passenger);
+/*     */   }
+/*     */   
+/*     */   public void updatePosition(@Nullable Entity ridEnt) {
+/* 129 */     if (ridEnt != null) {
+/* 130 */       ridEnt.setPosition(this.posX, this.posY, this.posZ);
+/* 131 */       ridEnt.motionX = ridEnt.motionY = ridEnt.motionZ = 0.0D;
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   public void updateRotation(@Nullable Entity ridEnt, float yaw, float pitch) {
+/* 136 */     if (ridEnt != null) {
+/* 137 */       ridEnt.rotationYaw = yaw;
+/* 138 */       ridEnt.rotationPitch = pitch;
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   protected void checkDetachmentAndDelete() {
+/* 143 */     if (!this.isDead && (this.seatID < 0 || getParent() == null || (getParent()).isDead)) {
+/* 144 */       if (getParent() != null && (getParent()).isDead) {
+/* 145 */         this.parentSearchCount = 100000000;
+/*     */       }
+/*     */       
+/* 148 */       if (this.parentSearchCount >= 1200) {
+/* 149 */         setDead();
+/* 150 */         if (!this.world.isRemote) {
+/* 151 */           Entity riddenByEntity = getRiddenByEntity();
+/* 152 */           if (riddenByEntity != null) {
+/* 153 */             riddenByEntity.dismountRidingEntity();
+/*     */           }
+/*     */         } 
+/*     */         
+/* 157 */         setParent((MCH_EntityAircraft)null);
+/* 158 */         MCH_Lib.DbgLog(this.world, "[Error]座席エンティティは本体が見つからないため削除 seat=%d, parentUniqueID=%s", new Object[] { Integer.valueOf(this.seatID), this.parentUniqueID });
+/*     */       } else {
+/* 160 */         this.parentSearchCount++;
+/*     */       } 
+/*     */     } else {
+/* 163 */       this.parentSearchCount = 0;
+/*     */     } 
+/*     */   }
+/*     */   
+/*     */   protected void writeEntityToNBT(NbtCompound par1NBTTagCompound) {
+/* 168 */     par1NBTTagCompound.setInteger("SeatID", this.seatID);
+/* 169 */     par1NBTTagCompound.setString("ParentUniqueID", this.parentUniqueID);
+/*     */   }
+/*     */   
+/*     */   protected void readEntityFromNBT(NbtCompound par1NBTTagCompound) {
+/* 173 */     this.seatID = par1NBTTagCompound.getInteger("SeatID");
+/* 174 */     this.parentUniqueID = par1NBTTagCompound.getString("ParentUniqueID");
+/*     */   }
+/*     */   
+/*     */   /*     */   public float getShadowSize() {
+/* 179 */     return 0.0F;
+/*     */   }
+/*     */   
+/*     */   public boolean canRideMob(Entity entity) {
+/* 183 */     return (getParent() != null && this.seatID >= 0 && !(getParent().getSeatInfo(this.seatID + 1) instanceof MCH_SeatRackInfo));
+/*     */   }
+/*     */   
+/*     */   public boolean isGunnerMode() {
+/* 187 */     Entity riddenByEntity = getRiddenByEntity();
+/* 188 */     return (riddenByEntity != null && getParent() != null && getParent().getIsGunnerMode(riddenByEntity));
+/*     */   }
+/*     */   
+/*     */   public boolean processInitialInteract(@NotNull PlayerEntity player, @NotNull Hand hand) {
+/* 192 */     if (getParent() != null && !getParent().isDestroyed()) {
+/* 193 */       if (!getParent().checkTeam(player)) {
+/* 194 */         return false;
+/*     */       }
+/* 196 */       ItemStack itemStack = player.getHeldItem(hand);
+/* 197 */       if (!itemStack.isEmpty() && itemStack.getItem() instanceof com.norwood.mcheli.tool.MCH_ItemWrench)
+/* 198 */         return getParent().processInitialInteract(player, hand); 
+/* 199 */       if (!itemStack.isEmpty() && itemStack.getItem() instanceof com.norwood.mcheli.mob.MCH_ItemSpawnGunner) {
+/* 200 */         return getParent().processInitialInteract(player, hand);
+/*     */       }
+/* 202 */       Entity riddenByEntity = getRiddenByEntity();
+/* 203 */       if (riddenByEntity != null)
+/* 204 */         return false; 
+/* 205 */       if (player.getRidingEntity() != null)
+/* 206 */         return false; 
+/* 207 */       if (!canRideMob((Entity)player)) {
+/* 208 */         return false;
+/*     */       }
+/* 210 */       player.startRiding((Entity)this);
+/* 211 */       return true;
+/*     */     } 
+/*     */ 
+/*     */ 
+/*     */     
+/* 216 */     return false;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   @Nullable
+/*     */   public MCH_EntityAircraft getParent() {
+/* 222 */     return this.parent;
+/*     */   }
+/*     */   
+/*     */   public void setParent(MCH_EntityAircraft parent) {
+/* 226 */     this.parent = parent;
+/* 227 */     Entity riddenByEntity = getRiddenByEntity();
+/* 228 */     if (riddenByEntity != null) {
+/* 229 */       MCH_Lib.DbgLog(this.world, "MCH_EntitySeat.setParent:SeatID=%d %s : " + getParent(), new Object[] { Integer.valueOf(this.seatID), riddenByEntity.toString() });
+/* 230 */       if (getParent() != null) {
+/* 231 */         getParent().onMountPlayerSeat(this, riddenByEntity);
+/*     */       }
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   @Nullable
+/*     */   public Entity getRiddenByEntity() {
+/* 239 */     List<Entity> passengers = getPassengers();
+/* 240 */     return passengers.isEmpty() ? null : passengers.get(0);
+/*     */   }
+/*     */ }
+
+
+/* Location:              C:\Users\ASUS\Desktop\De-Compile\plmcjar\mchelionukebeta.jar!\com\norwood\mcheli\aircraft\MCH_EntitySeat.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

@@ -1,0 +1,48 @@
+/*    */ package com.norwood.mcheli.helper.criterion;
+/*    */ 
+/*    */ import com.google.common.collect.Sets;
+/*    */ import java.util.Set;
+/*    */ import net.minecraft.advancement.criterion.Criterion;
+/*    */ import net.minecraft.advancement.PlayerAdvancementTracker;
+/*    */ import net.minecraft.advancement.criterion.AbstractCriterionConditions;
+/*    */ import net.minecraft.util.ResourceLocation;
+/*    */ 
+/*    */ public class MCH_SimpleListeners
+/*    */ {
+/* 12 */   private final Set<Criterion.Listener<SimpleInstance>> listeners = Sets.newHashSet();
+/*    */   private final PlayerAdvancementTracker playerAdvancements;
+/*    */   
+/*    */   public MCH_SimpleListeners(PlayerAdvancementTracker playerAdvancements) {
+/* 16 */     this.playerAdvancements = playerAdvancements;
+/*    */   }
+/*    */   
+/*    */   public boolean isEmpty() {
+/* 20 */     return this.listeners.isEmpty();
+/*    */   }
+/*    */   
+/*    */   public void add(Criterion.Listener<SimpleInstance> listener) {
+/* 24 */     this.listeners.add(listener);
+/*    */   }
+/*    */   
+/*    */   public void remove(Criterion.Listener<SimpleInstance> listener) {
+/* 28 */     this.listeners.remove(listener);
+/*    */   }
+/*    */   
+/*    */   public void trigger() {
+/* 32 */     for (Criterion.Listener<SimpleInstance> listener : this.listeners)
+/* 33 */       listener.grantCriterion(this.playerAdvancements); 
+/*    */   }
+/*    */   
+/*    */   public static class SimpleInstance
+/*    */     extends AbstractCriterionConditions {
+/*    */     public SimpleInstance(ResourceLocation criterionIn) {
+/* 39 */       super(criterionIn);
+/*    */     }
+/*    */   }
+/*    */ }
+
+
+/* Location:              C:\Users\ASUS\Desktop\De-Compile\plmcjar\mchelionukebeta.jar!\com\norwood\mcheli\helper\criterion\MCH_SimpleListeners.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */

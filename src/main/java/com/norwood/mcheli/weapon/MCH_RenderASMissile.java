@@ -1,0 +1,37 @@
+/*    */ package com.norwood.mcheli.weapon;
+/*    */ import com.norwood.mcheli.wrapper.W_Entity;
+/*    */ import net.minecraft.client.render.entity.EntityRendererManager;
+/*    */ import net.minecraft.entity.Entity;
+/*    */ import net.minecraft.util.ResourceLocation;
+
+/*    */ import org.lwjgl.opengl.GL11;
+/*    */ 
+/*    */ /*    */ public class MCH_RenderASMissile extends MCH_RenderBulletBase<MCH_EntityBaseBullet> {
+/* 12 */   public static final IRenderFactory<MCH_EntityBaseBullet> FACTORY = MCH_RenderASMissile::new;
+/*    */   
+/*    */   public MCH_RenderASMissile(EntityRenderDispatcher renderManager) {
+/* 15 */     super(renderManager);
+/* 16 */     this.shadowSize = 0.5F;
+/*    */   }
+/*    */   
+/*    */   public void renderBullet(MCH_EntityBaseBullet entity, double posX, double posY, double posZ, float yaw, float partialTickTime) {
+/* 20 */     if (entity instanceof MCH_EntityBaseBullet) {
+/* 21 */       GL11.glPushMatrix();
+/* 22 */       GL11.glTranslated(posX, posY, posZ);
+/* 23 */       GL11.glRotatef(-entity.rotationYaw, 0.0F, 1.0F, 0.0F);
+/* 24 */       GL11.glRotatef(-entity.rotationPitch, -1.0F, 0.0F, 0.0F);
+/* 25 */       renderModel(entity);
+/* 26 */       GL11.glPopMatrix();
+/*    */     } 
+/*    */   }
+/*    */   
+/*    */   protected ResourceLocation getEntityTexture(MCH_EntityBaseBullet entity) {
+/* 31 */     return TEX_DEFAULT;
+/*    */   }
+/*    */ }
+
+
+/* Location:              C:\Users\ASUS\Desktop\De-Compile\plmcjar\mchelionukebeta.jar!\com\norwood\mcheli\weapon\MCH_RenderASMissile.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.1.3
+ */
