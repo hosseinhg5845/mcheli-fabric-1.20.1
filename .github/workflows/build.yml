@@ -14,11 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK 17 (Temurin)
+      - name: Set up JDK 21 (Temurin)
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
           java-package: jdk
 
       - name: Cache Gradle
@@ -32,7 +32,7 @@ jobs:
       - name: Build mod (best-effort)
         continue-on-error: true
         run: |
-          ./gradlew --no-daemon --stacktrace --no-configuration-cache --init-script gradle/init/force-gson.gradle build 2>&1 | tee gradle-build.log
+          ./gradlew --no-daemon --stacktrace build 2>&1 | tee gradle-build.log
           exit 0
 
       - name: Collect artifacts
