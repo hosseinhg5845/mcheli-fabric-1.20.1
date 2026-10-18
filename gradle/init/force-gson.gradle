@@ -1,15 +1,25 @@
+// Force Gson 2.8.9 (before ReflectionAccessFilter was added in 2.9.0)
+// 2.8.9 allows setting final fields via reflection without IllegalArgumentException.
 allprojects {
     buildscript {
         repositories {
             mavenCentral()
         }
         dependencies {
-            classpath 'com.google.code.gson:gson:2.10.1'
+            classpath 'com.google.code.gson:gson:2.8.9'
         }
     }
     configurations.all {
         resolutionStrategy {
-            force 'com.google.code.gson:gson:2.10.1'
+            force 'com.google.code.gson:gson:2.8.9'
+            force 'com.google.code.gson:gson-parent:2.8.9'
         }
+    }
+}
+
+// Also force it for the Gradle plugin classpath
+settingsEvaluated { settings ->
+    settings.pluginManagement.repositories {
+        mavenCentral()
     }
 }
