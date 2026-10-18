@@ -2,9 +2,15 @@ buildscript {
     repositories {
         maven { name = 'Fabric'; url = 'https://maven.fabricmc.net/' }
         mavenCentral()
+        gradlePluginPortal()
     }
     dependencies {
         classpath "net.fabricmc:fabric-loom:${loom_version}"
+        // Force a newer Gson that supports Java records
+        classpath "com.google.code.gson:gson:2.10.1"
+    }
+    configurations.classpath.resolutionStrategy {
+        force "com.google.code.gson:gson:2.10.1"
     }
 }
 
