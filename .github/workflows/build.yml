@@ -29,13 +29,10 @@ jobs:
             ~/.gradle/wrapper
           key: fabric-1.20.1-${{ runner.os }}-${{ hashFiles('build.gradle', 'gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
       - name: Build mod (best-effort)
         continue-on-error: true
         run: |
-          ./gradlew --no-daemon --stacktrace build 2>&1 | tee gradle-build.log
+          ./gradlew --no-daemon --stacktrace --no-configuration-cache build 2>&1 | tee gradle-build.log
           exit 0
 
       - name: Collect artifacts
@@ -47,7 +44,6 @@ jobs:
             for f in build/libs/*.jar; do
               [ -e "$f" ] || continue
               cp "$f" dist/
-              JAR_FOUND=1
             done
           fi
           [ -f gradle-build.log ] && cp gradle-build.log dist/ || true
@@ -74,10 +70,6 @@ jobs:
             # MC Helicopter Overdrive - Fabric 1.20.1 Edition
 
             A port of MCHeli to Minecraft 1.20.1 (Fabric). Currently a work in progress.
-
-            See the build log (`gradle-build.log`) for the compile status — the mod may not
-            compile cleanly yet because the source is being incrementally migrated from
-            Forge 1.12.2 to Fabric 1.20.1.
           files: |
             dist/*.jar
             dist/gradle-build.log
