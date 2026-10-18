@@ -32,7 +32,7 @@ jobs:
       - name: Build mod (best-effort)
         continue-on-error: true
         run: |
-          ./gradlew --no-daemon --stacktrace --no-configuration-cache build 2>&1 | tee gradle-build.log
+          ./gradlew --no-daemon --stacktrace --no-configuration-cache --init-script gradle/init/force-gson.gradle build 2>&1 | tee gradle-build.log
           exit 0
 
       - name: Collect artifacts

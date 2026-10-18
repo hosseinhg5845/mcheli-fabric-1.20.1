@@ -1,0 +1,15 @@
+allprojects {
+    buildscript {
+        repositories {
+            mavenCentral()
+        }
+        dependencies {
+            classpath 'com.google.code.gson:gson:2.10.1'
+        }
+    }
+    configurations.all {
+        resolutionStrategy {
+            force 'com.google.code.gson:gson:2.10.1'
+        }
+    }
+}
